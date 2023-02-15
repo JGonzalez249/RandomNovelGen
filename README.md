@@ -1,2 +1,2 @@
 # RandomNovelGen
-A generative novel using GPT-3 and Tracery
+A generative novel using GPT-3
