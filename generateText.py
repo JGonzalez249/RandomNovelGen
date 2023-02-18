@@ -6,12 +6,12 @@
 
 import gpt_2_simple as gpt2
 import tracery
+import random
 import re
+
+
 from tracery.modifiers import base_english
 from tensorflow._api.v2.math import top_k
-
-
-
 
 # variable for the directory of the pre-trained model
 pretrained_model_dir = './checkpoint'
@@ -37,7 +37,7 @@ grammar = tracery.Grammar({
     "#hero.capitalize# wakes up in a #location# and discovers that they are the last person alive",
     "In a world where #technology# can manipulate reality, #hero.capitalize# must uncover the conspiracy to control #goal#",
     "#hero.capitalize# travels to a distant #planet# in search of #discovery# but ends up in the middle of a #disaster#",
-    "After a mission to investigate an abandoned facility, #hero.capitalize# #surprise# that could destroy the world",
+    "After a mission to investigate an abandoned facility, #hero.capitalize# #surprise.s# that could destroy the world",
     "In a future where #technology# has advanced beyond imagination, #hero.capitalize# must #mission# to prevent #disaster#",
     "In the year #year#, #hero.capitalize# is tasked with building a #technology# technology that could change the world #adverb#",
     "After a lab accident, #hero.capitalize# gains the power of #superpower# but quickly realizes it comes at a terrible cost",
@@ -85,24 +85,29 @@ top_k = 15 # 0 - 40 is recommended range
 top_p = 0.9 # 0.9 is recommended
 
 text = ""
+prefix = grammar.flatten("#story#")  # initialize prefix outside of loop
 for i in range(chunks):
-    prefix = grammar.flatten("#story#")
-
-    # Generate text using the model and the prefix from above
-    chunk = gpt2.generate(sess, run_name='run1', prefix=prefix, include_prefix=False, length=gen_length, temperature=temp, top_k=top_k, top_p=top_p, return_as_list=True)[0]
-
+    
+    if i == 0:
+        # Generate text using the model and the prefix from above
+        chunk = gpt2.generate(sess, run_name='run1', prefix=prefix, include_prefix=False, length=chunk_size, temperature=temp, top_k=top_k, top_p=top_p, return_as_list=True)[0]
+    else:
+        # Generate text using the model and the last sentence of the previous chunk as prefix
+        sentences = re.split("(?<=[.!?]) +", text)
+        prefix = sentences[-1] if len(sentences) > 1 else prefix
+        chunk = gpt2.generate(sess, run_name='run1', prefix=prefix, include_prefix=False, length=chunk_size, temperature=temp, top_k=top_k, top_p=top_p, return_as_list=True)[0]
+    
     if chunk is not None:
-        # Split chunk into sentences
-        sentences = re.split("(?<=[.!?]) +", chunk)
-        # Use the last sentence as the prefix for the next chunk
-        prefix = sentences[-1].strip()
         text += chunk
+        # remove the prefix from the beginning of the chunk
+        sentences = re.split("(?<=[.!?]) +", chunk)
+        prefix = sentences[-1] if len(sentences) > 1 else chunk
         print(chunk)
     else:
         print("Error: generated text is None.")
     
     # Print progress
-    print("Generated chunk {}/{}".format(i+1, chunks))
+    print("\033[1mGenerated chunk {}/{}\033[0m".format(i+1, chunks))
     
 # Print the generated text to the screen
 print(text)
