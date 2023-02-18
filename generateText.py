@@ -4,9 +4,11 @@
 # pip install tensorflow (tensorflow-gpu if you have a GPU)
 # pip install nltk
 
+### TO DO: implement tracery grammar for the story via json file import ###
+
 import gpt_2_simple as gpt2
 import tracery
-#import tracery_grammar
+#import tracery_grammar 
 import random
 import re
 import nltk
