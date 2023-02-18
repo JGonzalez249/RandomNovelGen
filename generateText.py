@@ -1,13 +1,17 @@
 # IF NOT INSTALLED:
 #!pip install -q gpt-2-simple
 #!pip install tracery
-#!pip install tensorflow
+#!pip install tensorflow (tensorflow-gpu if you have a GPU)
 
-import os
+
 import gpt_2_simple as gpt2
 import tracery
+import re
 from tracery.modifiers import base_english
 from tensorflow._api.v2.math import top_k
+
+
+
 
 # variable for the directory of the pre-trained model
 pretrained_model_dir = './checkpoint'
@@ -22,7 +26,7 @@ grammar = tracery.Grammar({
     "story": [
     "#hero.capitalize# wakes up in #location# and discovers #discovery#",
     "In a world where #technology# is #adjective#, #hero.capitalize# must find a way to #goal# before it's too late",
-    "#hero.capitalize# travels forward in time to #year# and is surprised to find #surprise#",
+    "#hero.capitalize# travels forward in time to #year# and is surprised to find they #surprise#",
     "After a mission to explore a distant #planet#, #hero.capitalize# discovers a #alien# that changes everything",
     "In a future where #disaster# has led to widespread #adjectiveSituation#, #hero.capitalize# must #mission# to #goal# and #survive#",
     "In the year #year#, #hero.capitalize# discovers a new form of #technology# that alters the course of #history# #adverb#",
@@ -34,8 +38,8 @@ grammar = tracery.Grammar({
     "In a world where #technology# can manipulate reality, #hero.capitalize# must uncover the conspiracy to control #goal#",
     "#hero.capitalize# travels to a distant #planet# in search of #discovery# but ends up in the middle of a #disaster#",
     "After a mission to investigate an abandoned facility, #hero.capitalize# #surprise# that could destroy the world",
-    "In a future where #technology# has advanced beyond imagination, #hero.capitalize# must #mission# to prevent a catastrophic #disaster#",
-    "In the year #year#, #hero.capitalize# is tasked with building a massive #technology# that could change the world #adverb#",
+    "In a future where #technology# has advanced beyond imagination, #hero.capitalize# must #mission# to prevent #disaster#",
+    "In the year #year#, #hero.capitalize# is tasked with building a #technology# technology that could change the world #adverb#",
     "After a lab accident, #hero.capitalize# gains the power of #superpower# but quickly realizes it comes at a terrible cost",
     "The government has been covering up the existence of #alien# for years, but #hero.capitalize# is about to uncover the #adjective# truth",
     "#hero.capitalize# is a #occupation# who discovers a hidden society of #humans# with incredible #superpower#",
@@ -45,15 +49,15 @@ grammar = tracery.Grammar({
     "#hero.capitalize# travels to the distant future and finds a world that is both #adjective# and #adjective#",
     "After a mission to retrieve a powerful artifact, #hero.capitalize# is betrayed by their team and must find a way to #survive#",
 ],
-    "hero": ["scientist", "astronaut", "robot", "alien", "time traveler", "cyborg", "mutant", "cloning experiment"],
+    "hero": ["Aaliyah", "Aiden", "Akira", "Alara", "Alexa", "Alexios", "Alyssa", "Amara", "Anakin", "Andromeda", "Apollo", "Aria", "Aric", "Arya", "Atlas", "Aurora", "Avril", "Ayana", "Azura", "Ben", "Calypso", "Cameron", "Cassius", "Celeste", "Ceres", "Chandra", "Chara", "Chris", "Cleo", "Cygnus", "Dahlia", "Darian", "Dash", "Demeter", "Dione", "Dominic", "Drake", "Eris", "Esmeralda", "Ethan", "Evangeline", "Gaia", "Gideon", "Halcyon", "Harper", "Hestia", "Icarus", "Io", "Jada", "Jaxon", "Kaida", "Kalen", "Kalliope", "Kamari", "Kato", "Kenji", "Kian", "Korbin", "Kyra", "Landon", "Lavinia", "Leo", "Lysandra", "Lystra", "Mace", "Maia", "Mako", "Marcella", "Mars", "Micah", "Mira", "Nadia", "Neo", "Nova", "Orion", "Pandora", "Phoenix", "Qadira", "Rhea", "Rigel", "Saffron", "Sage", "Samara", "Selena", "Serena", "Sirius", "Sol", "Stella", "Tahlia", "Talos", "Tara", "Terra", "Thalia", "Thetis", "Titania", "Triton", "Ulysses", "Vega", "Venus", "Xander", "Xanthe", "Yara", "Zara", "Zephyr", "Zora"],
     "location": ["on a space station orbiting a black hole", "in a city on a planet with a toxic atmosphere", "in an underground research facility on a distant moon", "on a terraformed asteroid colony", "in a cyberpunk megacity", "on a generation ship traveling through deep space", "in a virtual reality simulation", "on a planet overrun by alien vegetation", "in a post-apocalyptic wasteland", "in a time-traveling space vessel", "in a floating city above the clouds", "in a post-apocalyptic wasteland", "on a space station orbiting a black hole", "in a virtual reality simulation", "on a terraformed moon of #planet#"],
     "discovery": ["a new species of alien life", "a hidden government conspiracy", "a rogue artificial intelligence", "the secret to time travel", "a cure for a deadly disease"],
-    "technology": ["nanotechnology", "virtual reality", "artificial intelligence", "genetic engineering", "quantum computing"],
-    "adjectiveSituation": ["out of control", "the key to salvation", "banned by the government", "beyond human comprehension", "on the brink of collapse"],
+    "technology": ["robotics", "holography", "teleportation", "time travel", "antigravity", "cloning", "stem cells", "nanobots", "superconductors", "lasers", "space travel", "terraforming", "warp drive", "wormholes", "dyson spheres", "mind uploading", "brain-computer interface", "simulated reality", "digital immortality", "mind control"],
+    "adjectiveSituation": ["out of control", "the key to salvation", "banned by the government", "beyond human comprehension", "on the brink of collapse", "under investigation", "shrouded in mystery", "plagued by corruption", "in need of reform", "threatened by a new enemy", "ripe for revolution", "haunted by a dark past", "fueled by greed and ambition", "inspired by a noble cause", "ravaged by a deadly virus", "dominated by a powerful faction", "torn apart by civil war", "protected by a secret order", "infested with zombies and mutants", "infiltrated by spies and traitors","dependent on a scarce resource","governed by a strict code of honor","exposed to a cosmic anomaly","at war with an alien race","facing an imminent disaster"],
     "challenge": ["outwit the government", "uncover a hidden truth", "rescue a loved one", "save the planet from destruction", "solve a mystery"],
     "goal": ["save the galaxy from destruction", "discover a way to travel faster than light", "defeat an alien invasion force", "prevent a catastrophic event from occurring", "create a new era of peace and prosperity", "make groundbreaking scientific discoveries", "establish diplomatic relations with an alien species", "find a cure for a deadly space virus", "uncover the truth behind a mysterious phenomenon", "build a new society on #planet#"],    
     "year": ["2077", "2250", "2376", "2400", "2439", "2467", "2499", "2522", "2568", "2671", "2775", "2899", "2981", "3057", "3120", "3228", "3386", "3537", "3701", "3849", "3986", "4092", "4209", "4345", "4500"],
-    "surprise": ["meets their own ancestors", "changes the course of history", "discovers a new civilization", "comes face-to-face with their worst enemy"],
+    "surprise": ["are stranded on an alien planet", "discover a long-lost artifact", "uncover a conspiracy", "meet a sentient alien race", "are transported to another dimension", "travel back in time", "found a hidden portal to another world", "unearth a mysterious object", "are confronted by a ghost from their past", "encounter a hostile AI", "discover a secret society", "are abducted by aliens", "awaken a dormant force", "solve a centuries-old mystery", "face their darkest fear"],
     "planet": ["Alderaan", "Arrakis", "Caprica", "Coruscant", "Dagobah", "Earth", "Ego", "Gallifrey", "Hoth", "Krypton", "Mars", "Naboo", "Namek", "Pandora", "Sakaar", "Tatooine", "Titan", "Vega", "Vulcan", "Yavin 4", "Cygnus", "Jupiter", "Mercury", "Neptune", "Saturn", "Uranus", "Venus", "Pern", "Kobol"],
     "alien": ["an alien artifact that holds untold secrets", "an alien symbiote that grants superhuman abilities", "a group of stranded aliens seeking refuge on Earth", "an alien species with a unique form of communication", "a powerful alien entity that threatens the galaxy", "a team of alien scientists studying #planet#'s ecosystems", "an alien invasion force disguised as humans", "an alien race with a deep connection to the cosmos", "an alien civilization that has mastered time travel", "a rogue alien warrior on a mission of revenge"],
     "disaster": ["a global pandemic", "nuclear war", "climate change", "an alien invasion", "a catastrophic asteroid impact"],
@@ -69,19 +73,36 @@ grammar = tracery.Grammar({
     "responsibility": ["take down a corrupt government", "stop a mad scientist from destroying the world", "protect a valuable artifact from falling into the wrong hands", "save the life of someone they hate"],
 }, )
 grammar.add_modifiers(base_english)
-prefix = grammar.flatten("#story# ")
 
-# Generate text using the model and the prefix from above
-gen_text = gpt2.generate(sess,
-              run_name='run1',
-              length=50000,
-              temperature=1,
-              prefix=prefix,
-              top_k=20,
-              top_p=0.9,
-              nsamples=1,
-              batch_size=1
-              )
+# Set the number of chucks to generate (1024 Tokens each)
+num_chunks = 3
+chunk_size = 1024 # 1024 is the maximum number of tokens the model can generate at a time
+chunks = num_chunks  
+gen_length = chunk_size * chunks # Total number of tokens to generate
 
+temp = 1 # 0.7 - 1.0 is recommended range
+top_k = 15 # 0 - 40 is recommended range
+top_p = 0.9 # 0.9 is recommended
+
+text = ""
+for i in range(chunks):
+    prefix = grammar.flatten("#story#")
+
+    # Generate text using the model and the prefix from above
+    chunk = gpt2.generate(sess, run_name='run1', prefix=prefix, include_prefix=False, length=gen_length, temperature=temp, top_k=top_k, top_p=top_p, return_as_list=True)[0]
+
+    if chunk is not None:
+        # Split chunk into sentences
+        sentences = re.split("(?<=[.!?]) +", chunk)
+        # Use the last sentence as the prefix for the next chunk
+        prefix = sentences[-1].strip()
+        text += chunk
+        print(chunk)
+    else:
+        print("Error: generated text is None.")
+    
+    # Print progress
+    print("Generated chunk {}/{}".format(i+1, chunks))
+    
 # Print the generated text to the screen
-print(gen_text)
+print(text)
