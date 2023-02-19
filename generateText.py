@@ -1,11 +1,14 @@
 import os
+import subprocess
+import platform
 import gpt_2_simple as gpt2
 from grammar import get_grammar
 import re
-import nltk
-
-nltk.download('punkt') # Download the punkt tokenizer
+import random
 from nltk.tokenize import sent_tokenize # Import the sentence tokenizer
+
+# variable for the directory of the script
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # variable for the directory of the pre-trained model
 pretrained_model_dir = './checkpoint'
@@ -21,7 +24,7 @@ def generate_text():
     tracery_instance = get_grammar()
 
     # Set the number of chunks to generate (1024 Tokens each)
-    num_chunks = 3
+    num_chunks = 8
     chunk_size = 1024  # 1024 is the maximum number of tokens the model can generate at a time
     total_chunks = num_chunks
     
@@ -29,9 +32,14 @@ def generate_text():
     top_k = 40 # 40 is recommended due to the small size of the model
     top_p = 0.9  # 0.9 is recommended 
 
+    # Set the maximum and minimum number of sentences per paragraph
+    min_sentences = 5
+    max_sentences = 7
+
     text = ""
     prefix = tracery_instance.flatten("#story#")  # initialize prefix
     chunks = []
+    sentence_count = 0  # Initialize sentence count
     for i in range(total_chunks):
         # Include prefix for first chunk
         if i == 0:
@@ -52,10 +60,22 @@ def generate_text():
             chunk = re.sub(r'[^\x00-\x7F]+', '', chunk)  # Remove non-ASCII characters
             chunk = re.sub(r'(\n )+', '\n', chunk)  # Remove extra spaces after newlines
             chunk = re.sub(r'\n+', '\n', chunk)  # Remove extra newlines
+            # Split the chunk into sentences and count the number of sentences
+            sentences = sent_tokenize(chunk)
+            sentence_count += len(sentences)
+
+ # If the number of sentences exceeds the range, add a new paragraph
+            if sentence_count + len(sentences) > random.randint(5, 7):
+                chunks.append('\n\n')  # Add a new paragraph
+                sentence_count = len(sentences)  # Reset the sentence count
+            else:
+                sentence_count += len(sentences)
+
             chunks.append(chunk.strip())  # Add the cleaned chunk to the list
             print(chunk)
         else:
             print("Error: generated text is None.")
+
 
         # Set the new prefix to be the last 3 sentences of the generated chunk
         last_sentences = sent_tokenize(chunk)[-3:]
@@ -64,11 +84,25 @@ def generate_text():
     # Concatenate the generated chunks with an empty line between them
     text = '\n\n'.join(chunks)
 
-    # Create a new file with an incremented filename and write the generated text to it
-    filename = 'output/genText{:02d}.txt'.format(len([f for f in os.listdir('output') if f.startswith('genText')]) + 1)
+    # Remove repetitions in the generated text
+    for i in range(num_chunks):
+        text = re.sub(r'(\. ){3,}', '. ', text)  # Remove repetitions of 3 or more ". "
+
+    # create a directory for the output files
+    output_dir = os.path.join(script_dir, 'output')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    # Create a file with the generated text
+    filename = os.path.join(output_dir, 'genText{:02d}.txt'.format(len([f for f in os.listdir(output_dir) if f.startswith('genText')]) + 1))
     with open(filename, 'w') as file:
-        # Write the entire generated text to the file
         file.write(text)
+    # Open the file using the system's default text editor
+    if platform.system() == 'Darwin':  # macOS
+        subprocess.call(('open', filename))
+    elif platform.system() == 'Windows':  # Windows
+        os.startfile(filename)
+    else:  # Linux
+        subprocess.call(('xdg-open', filename))
 
     return text
 
