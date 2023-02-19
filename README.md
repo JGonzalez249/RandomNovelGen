@@ -24,12 +24,6 @@ To use this, you need to Python 3.6 or higher and pip installed. You also need t
  pip install tracery
  ```
 
- * **Tensorflow**
- 
- ```
- pip install tensorflow
- ```
-
  * **ntlk**
  
  ```
