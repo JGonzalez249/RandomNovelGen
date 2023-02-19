@@ -1,17 +1,11 @@
-import subprocess
-subprocess.run(["pip", "install", "gpt-2-simple"])
-subprocess.run(["pip", "install", "tracery"])
-subprocess.run(["pip", "install", "tensorflow"])
-subprocess.run(["pip", "install", "nltk"])
-
+import os
 import gpt_2_simple as gpt2
 from grammar import get_grammar
-import random
 import re
 import nltk
 
-nltk.download('punkt')
-from nltk.tokenize import sent_tokenize
+nltk.download('punkt') # Download the punkt tokenizer
+from nltk.tokenize import sent_tokenize # Import the sentence tokenizer
 
 # variable for the directory of the pre-trained model
 pretrained_model_dir = './checkpoint'
@@ -20,19 +14,20 @@ pretrained_model_dir = './checkpoint'
 sess = gpt2.start_tf_sess()
 gpt2.load_gpt2(sess, checkpoint_dir=pretrained_model_dir)
 
-def generate_last_chunk():
+# Function to generate text using the GPT-2 model
+def generate_text():
+    from tensorflow._api.v2.math import top_k
     # create a Tracery instance
     tracery_instance = get_grammar()
 
     # Set the number of chunks to generate (1024 Tokens each)
-    num_chunks = 3
+    num_chunks = 2
     chunk_size = 1024  # 1024 is the maximum number of tokens the model can generate at a time
     total_chunks = num_chunks
-    #gen_length = chunk_size * total_chunks  # Total number of tokens to generate
-
-    temp = 1  # 0.7 - 1.0 is recommended range
-    top_k = 40  # 0 - 40 is recommended range
-    top_p = 0.9  # 0.9 is recommended
+    
+    temp = 1  # 0.7 - 1.0 is recommended range for the temperature
+    top_k = 40 # 40 is recommended due to the small size of the model
+    top_p = 0.9  # 0.9 is recommended 
 
     text = ""
     prefix = tracery_instance.flatten("#story#")  # initialize prefix
@@ -50,7 +45,7 @@ def generate_last_chunk():
         # Generate text using the model and the prefix from above
         chunk = gpt2.generate(sess, run_name='run1', prefix=chunk_prefix, include_prefix=False, length=chunk_size,
                               temperature=temp, top_k=top_k, top_p=top_p, return_as_list=True)[0]
-
+        # Check if the generated text is not None
         if chunk is not None:
             # Clean up the chunk using regular expressions
             chunk = re.sub(r'\s+', ' ', chunk)  # Remove extra whitespace
@@ -66,13 +61,18 @@ def generate_last_chunk():
         last_sentences = sent_tokenize(chunk)[-3:]
         prefix = ' '.join(last_sentences)
 
-        # Print progress
-        #print(f"\033[1mGenerated chunk {i + 1}/{total_chunks}\033[0m")
-
-    # Concatenate the generated chunks and split into paragraphs
+    # Concatenate the generated chunks with an empty line between them
     text = '\n\n'.join(chunks)
-    return chunks[-1]
 
+    # Create a new file with an incremented filename and write the generated text to it
+    filename = 'output/genText{:02d}.txt'.format(len([f for f in os.listdir('output') if f.startswith('genText')]) + 1)
+    with open(filename, 'w') as file:
+        # Write the entire generated text to the file
+        file.write(text)
+
+    return text
+
+# Run the script to generate text and print it to the terminal
 if __name__ == '__main__':
-    last_chunk = generate_last_chunk()
-    print(last_chunk)
+    generated_text = generate_text()
+    print(generated_text)
