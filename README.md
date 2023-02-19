@@ -30,6 +30,6 @@ To use this, you need to Python 3.6 or higher and pip installed. You also need t
 pip install ntlk
 ```
 
-Once all the packages are install, you can run the **generate.py** file to generate a novel. The generated novel will be saved in the **output** folder, it can be run multiple times to produce multiple **genTextXX.txt** files. You can run the **generate.py** file with the following command in the terminal: ```python generate.py```
+Once all the packages are installed, you can run the **generate.py** file to generate a short novel. The generated novel will be saved in the **output** folder, it can be run multiple times to produce multiple **genTextXX.txt** files. You can run the **generate.py** file with the following command in the terminal: ```python generate.py```
 
 
