@@ -21,7 +21,7 @@ def generate_text():
     tracery_instance = get_grammar()
 
     # Set the number of chunks to generate (1024 Tokens each)
-    num_chunks = 2
+    num_chunks = 3
     chunk_size = 1024  # 1024 is the maximum number of tokens the model can generate at a time
     total_chunks = num_chunks
     
