@@ -1,8 +1,8 @@
-# IF NOT INSTALLED:
-# pip install -q gpt-2-simple
-# pip install tracery
-# pip install tensorflow (tensorflow-gpu if you have a GPU)
-# pip install nltk
+import subprocess
+subprocess.run(["pip", "install", "gpt-2-simple"])
+subprocess.run(["pip", "install", "tracery"])
+subprocess.run(["pip", "install", "tensorflow"])
+subprocess.run(["pip", "install", "nltk"])
 
 import gpt_2_simple as gpt2
 from grammar import get_grammar
@@ -20,19 +20,19 @@ pretrained_model_dir = './checkpoint'
 sess = gpt2.start_tf_sess()
 gpt2.load_gpt2(sess, checkpoint_dir=pretrained_model_dir)
 
-def generate_text():
+def generate_last_chunk():
     # create a Tracery instance
     tracery_instance = get_grammar()
-    
+
     # Set the number of chunks to generate (1024 Tokens each)
     num_chunks = 3
-    chunk_size = 1024 # 1024 is the maximum number of tokens the model can generate at a time
-    total_chunks = num_chunks  
-    gen_length = chunk_size * total_chunks # Total number of tokens to generate
+    chunk_size = 1024  # 1024 is the maximum number of tokens the model can generate at a time
+    total_chunks = num_chunks
+    #gen_length = chunk_size * total_chunks  # Total number of tokens to generate
 
-    temp = 1 # 0.7 - 1.0 is recommended range
-    top_k = 15 # 0 - 40 is recommended range
-    top_p = 0.9 # 0.9 is recommended
+    temp = 1  # 0.7 - 1.0 is recommended range
+    top_k = 40  # 0 - 40 is recommended range
+    top_p = 0.9  # 0.9 is recommended
 
     text = ""
     prefix = tracery_instance.flatten("#story#")  # initialize prefix
@@ -43,28 +43,36 @@ def generate_text():
             chunk_prefix = prefix
         else:
             # Use the last 3 sentences of the previous chunk as prefix
-            last_sentences = sent_tokenize(chunks[-1])[-3:]
+            last_chunk = chunks[-1]
+            last_sentences = sent_tokenize(last_chunk)[-3:]
             chunk_prefix = ' '.join(last_sentences)
 
         # Generate text using the model and the prefix from above
-        chunk = gpt2.generate(sess, run_name='run1', prefix=chunk_prefix, include_prefix=False, length=chunk_size, temperature=temp, top_k=top_k, top_p=top_p, return_as_list=True)[0]
+        chunk = gpt2.generate(sess, run_name='run1', prefix=chunk_prefix, include_prefix=False, length=chunk_size,
+                              temperature=temp, top_k=top_k, top_p=top_p, return_as_list=True)[0]
 
         if chunk is not None:
-            chunks.append(chunk)
-            # remove the prefix from the beginning of the chunk
-            last_sentences = sent_tokenize(chunk)[-3:]
-            prefix = ' '.join(last_sentences)
+            # Clean up the chunk using regular expressions
+            chunk = re.sub(r'\s+', ' ', chunk)  # Remove extra whitespace
+            chunk = re.sub(r'[^\x00-\x7F]+', '', chunk)  # Remove non-ASCII characters
+            chunk = re.sub(r'(\n )+', '\n', chunk)  # Remove extra spaces after newlines
+            chunk = re.sub(r'\n+', '\n', chunk)  # Remove extra newlines
+            chunks.append(chunk.strip())  # Add the cleaned chunk to the list
             print(chunk)
         else:
             print("Error: generated text is None.")
-        
+
+        # Set the new prefix to be the last 3 sentences of the generated chunk
+        last_sentences = sent_tokenize(chunk)[-3:]
+        prefix = ' '.join(last_sentences)
+
         # Print progress
-        print(f"\033[1mGenerated chunk {i+1}/{total_chunks}\033[0m")
-        
-    # Concatenate the generated chunks and print to screen
-    text = ''.join(chunks)
-    return text
+        #print(f"\033[1mGenerated chunk {i + 1}/{total_chunks}\033[0m")
+
+    # Concatenate the generated chunks and split into paragraphs
+    text = '\n\n'.join(chunks)
+    return chunks[-1]
 
 if __name__ == '__main__':
-    text = generate_text()
-    print(text)
+    last_chunk = generate_last_chunk()
+    print(last_chunk)
