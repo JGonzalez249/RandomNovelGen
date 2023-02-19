@@ -47,7 +47,7 @@ def generate_text():
             chunk_prefix = ' '.join(last_sentences)
 
         # Generate text using the model and the prefix from above
-        chunk = gpt2.generate(sess, run_name='run1', prefix=chunk_prefix, include_prefix=True, length=chunk_size, temperature=temp, top_k=top_k, top_p=top_p, return_as_list=True)[0]
+        chunk = gpt2.generate(sess, run_name='run1', prefix=chunk_prefix, include_prefix=False, length=chunk_size, temperature=temp, top_k=top_k, top_p=top_p, return_as_list=True)[0]
 
         if chunk is not None:
             chunks.append(chunk)
