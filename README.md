@@ -15,7 +15,7 @@ You need to download/clone this project from Github, [download and extract the c
 
 To use this, you need to Python 3.8 or higher and pip installed. You also need these packages installed:
 
-> Running  ```python setup.py ```in the root folder of the project on your terminal will check and install these packages for you, make sure to also download the pre-trained model.
+> Running  ```python setup.py ```in the root folder of the project on your terminal will check and install these packages for you, make sure to also download the pre-trained model using the link above.
 
 
  **gpt-2-simple**
