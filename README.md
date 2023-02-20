@@ -13,7 +13,7 @@ I may eventually package this into an executable file so that it can be used by 
 # How to use
 You need to download/clone this project from Github.
 
-To use this, you need to Python 3.6 or higher and pip installed. You also need these packages installed:
+To use this, you need to Python 3.8 or higher and pip installed. You also need these packages installed:
 
 > Running  ```python setup.py ```in the root folder of the project on your terminal will check and install these packages for you.
 
@@ -21,27 +21,28 @@ To use this, you need to Python 3.6 or higher and pip installed. You also need t
  **gpt-2-simple**
  
  
-    pip install gpt-2-simple
+      pip install gpt-2-simple
+
+
+ **tensorflow**
+ 
+      pip install tensorflow
  
 
  **Tracery**
  
  
-    pip install tracery
+      pip install tracery
  
 
  **ntlk**
  
 
-    pip install ntlk
+      pip install --user -U ntlk
 
 
 
-<<<<<<< HEAD
-Once all the packages are installed, you can run the **generateText.py** file to generate a short novel. The repo should have the pre-trained model in the checkpoint directory, if not, download the checkpoint folder [here] (https://drive.google.com/file/d/1-P_wwxipOteS4ePXZyN5YqJqn3cs8tX1/view?usp=sharing) and place it in the root of the project directory. The generated novel will be saved in the **output** directory that's created by the script and will open on your default text editor. It can be run multiple times to produce multiple **genTextXX.txt** files. You can run the **generateText.py** file with the following command in the terminal: 
-=======
-Once all the packages are installed, you can run the **generateText.py** file to generate a short novel. The repo should have the pre-trained model in the checkpoint directory, if not, download the checkpoint folder from [here](https://drive.google.com/file/d/1-P_wwxipOteS4ePXZyN5YqJqn3cs8tX1/view?usp=sharing) and place it in the root of the project directory. The generated novel will be saved in the **output** directory that's created by the script and will open on your default text editor. It can be run multiple times to produce multiple **genTextXX.txt** files. You can run the **generateText.py** file with the following command in the terminal: 
->>>>>>> 365f587 (updated README)
+Once all the packages are installed, you can run the **generateText.py** file to generate a short novel once you download the pre-trained model. To download the pre-trained folder, click [here] (https://drive.google.com/file/d/1-P_wwxipOteS4ePXZyN5YqJqn3cs8tX1/view?usp=sharing), extarct the **checkpoint folder** into the root of the project directory. You can then delete the tar file to save space. You can then run generateText.py script to generate a novel using the downloaded model. The generated novel will be saved in the **output** directory that's created by the script and will open on your default text editor. It can be run multiple times to produce multiple **genTextXX.txt** files. You can run the **generateText.py** file with the following command in the terminal: 
 
     python generateText.py
 
