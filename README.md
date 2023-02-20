@@ -42,7 +42,7 @@ To use this, you need to Python 3.8 or higher and pip installed. You also need t
 
 
 
-Once all the packages are installed, you can run the **generateText.py** file to generate a short novel once you download the pre-trained model. To download the pre-trained folder if you have not done so yet, click [here](https://drive.google.com/file/d/1-P_wwxipOteS4ePXZyN5YqJqn3cs8tX1/view?usp=sharing), extract the **checkpoint folder** into the root of the project directory. You can then delete the tar file to save space. You can then run generateText.py script to generate a novel using the downloaded model. The generated novel will be saved in the **output** directory that's created by the script and will open on your default text editor. It can be run multiple times to produce multiple **genTextXX.txt** files. You can run the **generateText.py** file with the following command in the terminal: 
+Once all the packages are installed, you can run the **generateText.py** file to generate a short novel once you download the pre-trained model. To download the pre-trained model, if you have not done so yet, click [here](https://drive.google.com/file/d/1-P_wwxipOteS4ePXZyN5YqJqn3cs8tX1/view?usp=sharing), extract the **checkpoint folder** into the root of the project directory. You can then delete the tar file to save space. You can then run generateText.py script to generate a novel using the downloaded model. The generated novel will be saved in the **output** directory that's created by the script and will open on your default text editor. It can be run multiple times to produce multiple **genTextXX.txt** files. You can run the **generateText.py** file with the following command in the terminal: 
 
     python generateText.py
 
