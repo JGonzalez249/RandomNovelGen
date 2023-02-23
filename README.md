@@ -38,7 +38,7 @@ To use this, you need to Python 3.8 or higher and pip installed. You also need t
  **ntlk**
  
 
-      pip install --user -U ntlk
+      pip install ntlk
 
 
 
